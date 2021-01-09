@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>COVID-19 Prediction Model</title>
+    <meta name="description" content="COVID-19 Prediction Model" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <!-- Navbar using Bootstrap for easy styling. Docs: https://getbootstrap.com/docs/5.0/components/navbar/  -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">COVID-19 Prediction Stats</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Cases by County</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/cases-by-state">Cases by State</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <section class="intro">
+        <h1>COVID-19 Prediction Statistics</h1>
+        <p>
+            Welcome to the COVID-19 Prediction Statistics Dashboard. This Dashboard
+            is not meant to cause fear, but to make you more aware of future
+            predictions according to the current trends in your area. This
+            application uses a polynomial regression model to predict the trend
+            based on a formula similar to y = ax^2 + bx + c. We see this kind of
+            trend fits with the data well because the number of cases seems to be
+            growing exponentially.
+        </p>
+        <p>
+            The results of your selection will also show an an R-squared value. This
+            value determines how well the trend-line of the polynomial regression
+            model fits with the data. The closer the number is to 1, the better.
+        </p>
+        <p>
+            For more information about COVID-19 and how you can slow down the
+            spread, please list
+            <a href="https://www.cdc.gov/coronavirus/2019-ncov/index.html"
+            >the CDC</a
+            >
+            for more information.
+        </p>
+    </section>
+
+    <section>
+      <div class="county-form">
+        <p>Enter your State Info</p>
+        {% if error %}
+          <p class="error">{{ error }}</p>
+        {% endif %}
+        <form method="POST" action="/cases-by-state">
+          State: <br />
+          <select name="state" id="state">
+            <option value="" selected="selected">Select a state</option>
+          </select>
+          <br /><br />
+          Date:<br />
+          <input type="date" name="date" min="2021-01-01" /><br />
+          <button class="btn btn-primary" type="submit" value="Submit">
+            Submit
+          </button>
+        </form>
+      </div>
+      {% if date %}
+      <div class="prediction-box">
+        <h1>Predicted Cases on {{ date }} in {{ state }}:</h1>
+        <h1 class="cases">{{ cases }}</h1>
+        <h1 class="fraction">
+          <span class="fraction-highlight">{{ percentage }}%</span> of people in
+          your State will have COVID-19 on this date.
+        </h1>
+        <h1 class="fraction">
+          About <span class="fraction-highlight">{{ fraction }}</span> people in
+          your State will have COVID-19 on this date.
+        </h1>
+      </div>
+      <div>
+        <h3>Additional Info</h3>
+        <p><strong>Date chosen:</strong> {{ date }}</p>
+        <p><strong>State:</strong> {{ state }}</p>
+        <p><strong>Predicted Cases:</strong> {{ cases }}</p>
+        <p><strong>Population Percentage:</strong> {{ percentage }}%</p>
+        <p><strong>Population Fraction:</strong> {{ fraction }}</p>
+        <p><strong>R-squared for Prediction Model:</strong> {{ r_squared }}</p>
+
+        <h3 class="raw-data">Raw Data Example</h3>
+        {% for table in tables %} {{ table|safe }} {% endfor %}
+      </div>
+      <div class="chart" id="linegraph">
+        <script>
+          var graphs = {{line_graph | safe}};
+          var layout = {
+              title: {
+                  text:`Current COVID-19 trend for {{state}} in 2020`
+              },
+              xaxis: {
+                  title: {
+                  text: 'Date'
+                  },
+              },
+              yaxis: {
+                  title: {
+                  text: 'Number of Cases',
+                  }
+              }
+              };
+          Plotly.plot('linegraph',graphs, layout);
+        </script>
+      </div>
+      <div id="bubble_map">
+        <script>
+          var graphs = {{bar_graph | safe}};
+          var layout = {
+              title: {
+                  text:`Current COVID-19 numbers for all counties in {{state}} in 2020`
+              },
+              xaxis: {
+                  title: {
+                  text: 'State'
+                  },
+              },
+              yaxis: {
+                  title: {
+                  text: 'Number of Cases',
+                  }
+              }
+              };
+          Plotly.plot('bubble_map',graphs, layout);
+        </script>
+      </div>
+      {% endif %}
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='table.js') }}"></script>
+    <script src="{{ url_for('static', filename='drop_down.js') }}"></script>
+
+
+    <footer>
+        <p>Created by Sean Dunaway</p>
+        <p>WGU - 2021</p>
+    </footer>
+  </body>
+</html>
