@@ -7,5 +7,4 @@ $(document).ready(function() {
 
     $dataTable.addClass('table');
     $dataTable.find('th').css('text-align', 'left');
-
 });
