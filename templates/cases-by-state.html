@@ -76,7 +76,7 @@
           </select>
           <br /><br />
           Date:<br />
-          <input id="date" type="date" name="date" min="2021-01-01" /><br />
+          <input id="date" type="date" name="date"/><br />
           <button class="btn btn-primary" type="submit" value="Submit">
             Submit
           </button>
@@ -84,7 +84,7 @@
       </div>
       {% if date %}
       <div class="prediction-box">
-        <h1>Predicted Cases on {{ date }} in {{ state }}:</h1>
+        <h1>Predicted Cumulative Cases on {{ date }} in {{ state }}:</h1>
         <h1 class="cases">{{ cases }}</h1>
         <h1 class="fraction">
           <span class="fraction-highlight">{{ percentage }}%</span> of people in
@@ -112,7 +112,7 @@
           var graphs = {{line_graph | safe}};
           var layout = {
               title: {
-                  text:`Current COVID-19 trend for {{state}} in 2020`
+                  text:`Current COVID-19 trend for {{state}}`
               },
               xaxis: {
                   title: {
@@ -121,7 +121,7 @@
               },
               yaxis: {
                   title: {
-                  text: 'Number of Cases',
+                  text: 'Number of Total Cases',
                   }
               }
               };
@@ -133,7 +133,7 @@
           var graphs = {{bar_graph | safe}};
           var layout = {
               title: {
-                  text:`Current COVID-19 numbers for all counties in {{state}} in 2020`
+                  text:`Current Cumulative COVID-19 numbers for all States`
               },
               xaxis: {
                   title: {
@@ -142,7 +142,7 @@
               },
               yaxis: {
                   title: {
-                  text: 'Number of Cases',
+                  text: 'Number of Total Cases',
                   }
               }
               };

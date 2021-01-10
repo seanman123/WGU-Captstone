@@ -59,9 +59,9 @@ class Covid_Stats:
         state_df = df
         if self.county != "":
             state_df = df[(df["state"] == self.state)]
-            state_df = state_df.groupby(['county']).sum().reset_index()
+            state_df = state_df.groupby(['county']).tail(1).reset_index()
         else:
-            state_df = state_df.groupby(['state']).sum().reset_index()
+            state_df = state_df.groupby(['state']).tail(1).reset_index()
 
         return state_df
 
@@ -121,7 +121,9 @@ class Covid_Stats:
         # county percentage 
         if self.county != "":
             population = int(pop_df.loc[(pop_df['state'] == self.state) & (pop_df['county'] == self.county)]['pop2019'])
+            print(population)
             number_of_cases = int(cases)
+            print(number_of_cases)
 
         # state compared to nation percentage
         else:
@@ -159,8 +161,9 @@ class Covid_Stats:
     # Creates the bar graph plot on the dashboard 
     def create_bar_graph(self):
         state_df = self.state_data()
+        group_state_df = state_df.groupby("county").tail(1)
         if self.county != "":
-            data=[go.Bar(x=state_df['county'], y=state_df['cases'])]
+            data=[go.Bar(x=group_state_df['county'], y=group_state_df['cases'])]
         else:
             data=[go.Bar(x=state_df['state'], y=state_df['cases'])]
         
