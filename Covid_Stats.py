@@ -9,14 +9,24 @@ from fractions import Fraction
 import plotly
 import plotly.graph_objs as go
 import json
+import requests 
+import csv
+
+# get request to get the latest COVID-19 data
+# idea from https://www.kite.com/python/answers/how-to-download-a-csv-file-from-a-url-in-python
+req = requests.get('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
+url_content = req.content
+csv_file = open('covid-stats.csv', 'wb')
+csv_file.write(url_content)
+csv_file.close()
 
 # Load in the covid-19 data frame 
-df = pd.read_csv("covid.csv")
+df = pd.read_csv('covid-stats.csv')
 df = df.sort_values(by=['state', 'county', 'date'])
 df = df[['date', 'county', 'state', 'cases', 'deaths']]
 
 # Load in the County population data frame 
-pop_df = pd.read_csv("counties.csv")
+pop_df = pd.read_csv('counties.csv')
 pop_df.head(10)
 
 # dataframe used for total population 
