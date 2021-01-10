@@ -9,21 +9,6 @@ from fractions import Fraction
 import plotly
 import plotly.graph_objs as go
 import json
-import requests 
-import csv
-
-# get request to get the latest COVID-19 data
-# idea from https://www.kite.com/python/answers/how-to-download-a-csv-file-from-a-url-in-python
-req = requests.get('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
-url_content = req.content
-csv_file = open('covid-stats.csv', 'wb')
-csv_file.write(url_content)
-csv_file.close()
-
-# Load in the covid-19 data frame 
-df = pd.read_csv('covid-stats.csv')
-df = df.sort_values(by=['state', 'county', 'date'])
-df = df[['date', 'county', 'state', 'cases', 'deaths']]
 
 # Load in the County population data frame 
 pop_df = pd.read_csv('counties.csv')
@@ -34,14 +19,24 @@ total_pop_df = pop_df.loc[pop_df['state'] == pop_df['county']]
 total_pop_df = total_pop_df['pop2019'].sum()
 
 class Covid_Stats:
-    def __init__(self, date, county = "", state = ""):
+    def __init__(self, data, date, county = "", state = ""):
         self.date = date
         self.county = county
         self.state = state
+        self.data = data
+
+    # Loads up the new COVID-19 stat data
+    def load_df(self):
+        # Load in the covid-19 data frame 
+        df = pd.read_csv(self.data)
+        df = df.sort_values(by=['state', 'county', 'date'])
+        df = df[['date', 'county', 'state', 'cases', 'deaths']]
+        return df
 
     # target data is either the county selected from the cases by county page 
     # or the state from the cases by state page 
     def target_data(self):
+        df = self.load_df()
         if self.county != "":
             target_df = df[(df["county"] == self.county) & (df["state"] == self.state)]
         else:
@@ -56,6 +51,7 @@ class Covid_Stats:
     # helps create a dataframe grouped by either country or grouped by state
     # depedning on the circumstance needed 
     def state_data(self):
+        df = self.load_df()
         state_df = df
         if self.county != "":
             state_df = df[(df["state"] == self.state)]

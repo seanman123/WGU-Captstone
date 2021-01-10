@@ -1,8 +1,19 @@
 from flask import Flask, request, render_template
 import pandas as pd
 from Covid_Stats import Covid_Stats
+import requests 
+import csv
 
 app = Flask(__name__)
+
+# get request to get the latest COVID-19 data
+# idea from https://www.kite.com/python/answers/how-to-download-a-csv-file-from-a-url-in-python
+req = requests.get('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv')
+url_content = req.content
+csv_file = open('covid-stats.csv', 'wb')
+csv_file.write(url_content)
+csv_file.close()
+
 
 # sets up our home page and uses a get/post request to return info selected from the County form
 @app.route('/', methods=['GET', 'POST'])
@@ -20,22 +31,22 @@ def index():
     bar_graph = ''
     df = pd.DataFrame()
     if request.method == 'POST' and 'county' in request.form:
-        try: 
-            county = request.form.get('county')
-            state = request.form.get('state')
-            date = request.form.get('date')
-            stat = Covid_Stats(date, county, state)
-            case_data = stat.cases_model()
-            percentage = stat.cases_percentage(case_data)
-            fraction = stat.cases_fraction(percentage)
-            bar = stat.create_plot()
-            bar_graph = stat.create_bar_graph()
-            df = stat.target_data()
-            df = df[['date', 'county', 'state', 'cases']]
-            df['date'] = stat.num_to_date(df['date'])
-            df = df.head(12)
-        except:
-            return render_template('index.html', error = error)
+        # try: 
+        county = request.form.get('county')
+        state = request.form.get('state')
+        date = request.form.get('date')
+        stat = Covid_Stats('covid-stats.csv', date, county, state)
+        case_data = stat.cases_model()
+        percentage = stat.cases_percentage(case_data)
+        fraction = stat.cases_fraction(percentage)
+        bar = stat.create_plot()
+        bar_graph = stat.create_bar_graph()
+        df = stat.target_data()
+        df = df[['date', 'county', 'state', 'cases']]
+        df['date'] = stat.num_to_date(df['date'])
+        df = df.head(12)
+        # except:
+            # return render_template('index.html', error = error)
     return render_template('index.html', 
         date = date, cases = case_data[0], 
         county = county, state = state, 
@@ -65,7 +76,7 @@ def cases_by_state():
         try: 
             state = request.form.get('state')
             date = request.form.get('date')
-            stat = Covid_Stats(date, county, state)
+            stat = Covid_Stats('covid-stats.csv', date, county, state)
             case_data = stat.cases_model()
             percentage = stat.cases_percentage(case_data)
             fraction = stat.cases_fraction(percentage)
