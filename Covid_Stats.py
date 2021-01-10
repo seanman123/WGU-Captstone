@@ -19,6 +19,7 @@ url_content = req.content
 csv_file = open('covid-stats.csv', 'wb')
 csv_file.write(url_content)
 csv_file.close()
+print(csv_file)
 
 # Load in the covid-19 data frame 
 df = pd.read_csv('covid-stats.csv')
