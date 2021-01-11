@@ -117,9 +117,7 @@ class Covid_Stats:
         # county percentage 
         if self.county != "":
             population = int(pop_df.loc[(pop_df['state'] == self.state) & (pop_df['county'] == self.county)]['pop2019'])
-            print(population)
             number_of_cases = int(cases)
-            print(number_of_cases)
 
         # state compared to nation percentage
         else:

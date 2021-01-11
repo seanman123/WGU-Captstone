@@ -31,22 +31,22 @@ def index():
     bar_graph = ''
     df = pd.DataFrame()
     if request.method == 'POST' and 'county' in request.form:
-        # try: 
-        county = request.form.get('county')
-        state = request.form.get('state')
-        date = request.form.get('date')
-        stat = Covid_Stats('covid-stats.csv', date, county, state)
-        case_data = stat.cases_model()
-        percentage = stat.cases_percentage(case_data)
-        fraction = stat.cases_fraction(percentage)
-        bar = stat.create_plot()
-        bar_graph = stat.create_bar_graph()
-        df = stat.target_data()
-        df = df[['date', 'county', 'state', 'cases']]
-        df['date'] = stat.num_to_date(df['date'])
-        df = df.head(12)
-        # except:
-            # return render_template('index.html', error = error)
+        try: 
+            county = request.form.get('county')
+            state = request.form.get('state')
+            date = request.form.get('date')
+            stat = Covid_Stats('covid-stats.csv', date, county, state)
+            case_data = stat.cases_model()
+            percentage = stat.cases_percentage(case_data)
+            fraction = stat.cases_fraction(percentage)
+            bar = stat.create_plot()
+            bar_graph = stat.create_bar_graph()
+            df = stat.target_data()
+            df = df[['date', 'county', 'state', 'cases']]
+            df['date'] = stat.num_to_date(df['date'])
+            df = df.head(12)
+        except:
+            return render_template('index.html', error = error)
     return render_template('index.html', 
         date = date, cases = case_data[0], 
         county = county, state = state, 

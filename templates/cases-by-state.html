@@ -81,6 +81,7 @@
             Submit
           </button>
         </form>
+        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
       </div>
       {% if date %}
       <div class="prediction-box">
@@ -88,11 +89,11 @@
         <h1 class="cases">{{ cases }}</h1>
         <h1 class="fraction">
           <span class="fraction-highlight">{{ percentage }}%</span> of people in
-          your State will have COVID-19 on this date.
+          your State will have had COVID-19 on this date.
         </h1>
         <h1 class="fraction">
           About <span class="fraction-highlight">{{ fraction }}</span> people in
-          your State will have COVID-19 on this date.
+          your State will have had COVID-19 on this date.
         </h1>
       </div>
       <div>
@@ -157,7 +158,7 @@
     <script src="{{ url_for('static', filename='drop_down.js') }}"></script>
     <script src="{{ url_for('static', filename='scroll.js') }}"></script>
     <script src="{{ url_for('static', filename='date.js') }}"></script>
-
+    <script src="{{ url_for('static', filename='click.js') }}"></script>
 
     <footer>
         <p>Created by Sean Dunaway</p>
